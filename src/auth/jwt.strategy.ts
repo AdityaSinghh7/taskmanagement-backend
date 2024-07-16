@@ -38,3 +38,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
 }
+
+
+
+// changes : search by status - implemented
+// db : add three more data columns (city, address, date) 
+// changes: search tasks by username
+// new api : change update to change city, address
+// new api : search likeness by username
+// search by date range api 

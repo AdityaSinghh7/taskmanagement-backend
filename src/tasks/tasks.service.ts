@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
 import { TaskStatus } from './task-status.enum';
 import { User } from 'src/auth/user.entity';
+import { GetTasksByDateRangeDto } from './dto/get-tasks-by-date-range.dto';
 
 @Injectable()
 export class TasksService {
@@ -20,9 +21,9 @@ export class TasksService {
     }
 
 
-    // getAllTasks(): Task[] {
-    //     return this.tasks;
-    // }
+    async searchTasksByUsername(username: string): Promise<Task[]> {
+        return this.taskRepository.searchTasksByUsername(username);
+    }
 
     async getTaskByID(id: number, user: User): Promise<Task> {
         const found = await this.taskRepository.findOne({ where: { id, userId: user.id } });
@@ -32,24 +33,6 @@ export class TasksService {
         return found
 
     }
-
-    // getTasksWithFilters(filterDto: GetTasksFilterDto): Task[] {
-    //     const { status, search } = filterDto;
-
-    //     let tasks = this.getAllTasks();
-
-    //     if (status) {
-    //         tasks = tasks.filter(task => task.status === status);
-    //     }
-
-    //     if (search) {
-    //         tasks = tasks.filter(task =>
-    //             task.title.includes(search) || task.description.includes(search),
-    //         );
-    //     }
-
-    //     return tasks;
-    // }
 
     async createTask(CreateTaskDto: CreateTaskDto, user: User): Promise<Task> {
         return this.taskRepository.createTask(CreateTaskDto, user);
@@ -69,6 +52,13 @@ export class TasksService {
         task.status = status;
         await task.save()
         return task;
+    }
+
+    async getTasksByDateRange(
+        getTasksByDateRangeDto: GetTasksByDateRangeDto,
+        user: User
+    ): Promise<Task[]> {
+        return this.taskRepository.getTasksByDateRange(getTasksByDateRangeDto, user);
     }
 
 }

@@ -3,6 +3,9 @@ import { User } from "./user.entity";
 import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { AuthCredentialsDto } from "src/tasks/dto/auth-credentials.dto";
 import * as bcrypt from 'bcrypt';
+import { SignUpDto } from "src/tasks/dto/sign-up.dto";
+import { SignInDto } from "src/tasks/dto/sign-in.dto";
+
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -11,14 +14,16 @@ export class UserRepository extends Repository<User> {
     }
 
 
-    async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-        const { username, password } = authCredentialsDto;
+    async signUp(signUpDto: SignUpDto): Promise<void> {
+        const { username, password, city, address } = signUpDto;
         const salt = await bcrypt.genSalt();
 
         const user = new User();
         user.username = username;
         user.salt = salt;
         user.password = await this.hashPassword(password, salt);
+        user.city = city;
+        user.address = address;
         try {
             await user.save();
         }
@@ -32,8 +37,8 @@ export class UserRepository extends Repository<User> {
         }
     } 
 
-    async validateUserPassword(authCredentialsDto: AuthCredentialsDto): Promise<string>{
-        const {username, password} = authCredentialsDto;
+    async validateUserPassword(signInDto: SignInDto): Promise<string>{
+        const {username, password} = signInDto;
         const user = await this.findOne({where: {username}});
 
         if(user && await user.validatePassword(password)){
